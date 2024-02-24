@@ -1,34 +1,49 @@
+%include "../utils/printf32.asm"
 
 section .data
-    N dw 1000
+    N dd 1000
+    three dw 3
+    five dw 5
 
 section .text
+    extern printf
     global main
 
 main:
-    mov cx,[N]
-    xor eax, eax
-    xor edx, edx
+    push ebp
+    mov ebp, esp
+
+    xor ecx, ecx
+    mov ecx, dword [N]
     xor ebx, ebx
 
 sum_loop:
-    mov ax, cx
-    mov dx, ax
-    mov edi, 3
-    shr edx, 8
-    shl eax, 8
-    push edx
+    xor eax, eax
+    xor edx, edx
+
+    mov eax, ecx
+    push ecx
+    xor ecx, ecx
+    mov cx, [three]
     push eax
-    div edi
+    div cx
+    pop eax
+    pop ecx
     cmp edx, 0
     je div_three
-    pop eax
-    pop edx
-    mov edi, 5
-    div edi
+
+    xor edx, edx
+    push ecx
+    xor ecx, ecx
+    mov cx, [five]
+    div cx
+    pop ecx
     cmp edx, 0
     je div_five
-    loop sum_loop
+    
+    sub ecx, 1
+    cmp ecx, 0
+    jg sum_loop
 
     jmp print
 
@@ -43,17 +58,7 @@ div_five:
     jmp sum_loop
 
 print:
-    ; write syscall
-    mov ecx, ebx ; message to write
-    mov edx, 16 ; message length
-    mov eax, 4 ; syscall number (sys_write)
-    mov ebx, 1 ; file descriptor (stdout)
-    int 0x80 ; call kernel
-
-    ; exit syscall
-    mov eax, 1 ; syscall number (sys_exit)
-    xor ebx, ebx ; exit code
-    int 0x80 ; call kernel
+    PRINTF32 `%u\n\x0`, ebx
     
     leave 
     ret
