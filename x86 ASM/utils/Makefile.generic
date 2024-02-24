@@ -7,3 +7,4 @@ include $(UTILSDIR)/Makefile.inc
 
 $(PROGNAME): $(OBJECTS)
 	$(CC) $^ -o $@ $(LDFLAGS)
+
