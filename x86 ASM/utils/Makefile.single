@@ -5,3 +5,4 @@ include $(UTILSDIR)/Makefile.inc
 
 %: %.o
 	$(CC) $^ -o $@ $(LDFLAGS)
+
